@@ -18,13 +18,13 @@ public class UserService {
     @Transactional
     public UserResponseDTO create(UserRequestDTO dto) {
         if (userRepository.existsByEmail(dto.email())) {
-            throw new BusinessException("Email já cadastrado no sistema.");
+            throw new BusinessException("Email already exists");
         }
 
         User user = User.builder()
                 .username(dto.username())
                 .email(dto.email())
-                .password(dto.password()) // No futuro aplicaremos o Hash aqui
+                .password(dto.password())
                 .build();
 
         user = userRepository.save(user);
