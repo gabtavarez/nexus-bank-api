@@ -1,9 +1,9 @@
 package com.tavarez.nexusbank.entities;
 
 import com.tavarez.nexusbank.enums.TransactionType;
+import com.tavarez.nexusbank.enums.TransactionStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.resource.transaction.spi.TransactionStatus;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
