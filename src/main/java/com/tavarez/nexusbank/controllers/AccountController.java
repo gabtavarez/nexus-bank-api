@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * Controller que expõe os endpoints para operações com contas bancárias.
  */
@@ -27,5 +29,11 @@ public class AccountController {
     public ResponseEntity<AccountResponseDTO> createAccount(@RequestBody @Valid AccountRequestDTO dto) {
         AccountResponseDTO response = accountService.createAccount(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/{accountNumber}")
+    public ResponseEntity<AccountResponseDTO> getAccount(@PathVariable String accountNumber) {
+        AccountResponseDTO response = accountService.findByAccountNumber(accountNumber);
+        return ResponseEntity.ok(response);
     }
 }

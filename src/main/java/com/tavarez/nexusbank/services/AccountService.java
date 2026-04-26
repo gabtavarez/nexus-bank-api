@@ -15,10 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.Random;
 
-/**
- * Serviço responsável pela gestão de contas bancárias no Nexus Bank.
- * Gerencia a abertura de novas contas e garante a unicidade do número da conta.
- */
 @Service
 public class AccountService {
 
@@ -28,24 +24,14 @@ public class AccountService {
     @Autowired
     private UserRepository userRepository;
 
-    /**
-     * Abre uma nova conta bancária para um usuário.
-     * Valida a existência do usuário, gera um número único de 6 dígitos e inicia o saldo com zero.
-     *
-     * @param dto Contém o ID do usuário e o tipo de conta (CHECKING/SAVINGS).
-     * @return AccountResponseDTO com os dados da conta criada.
-     * @throws BusinessException se o usuário não for encontrado.
-     */
     @Transactional
     public AccountResponseDTO createAccount(AccountRequestDTO dto) {
-        // Busca o dono da conta no banco de dados
         User owner = userRepository.findById(dto.userId())
                 .orElseThrow(() -> new BusinessException("User not found with ID: " + dto.userId()));
 
-        // Constrói a conta com número aleatório e saldo zerado
         Account account = Account.builder()
                 .accountNumber(generateUniqueAccountNumber())
-                .balance(BigDecimal.ZERO)
+                .balance(new java.math.BigDecimal("1000.00"))
                 .type(dto.type())
                 .status(AccountStatus.ACTIVE)
                 .owner(owner)
@@ -62,10 +48,6 @@ public class AccountService {
         );
     }
 
-    /**
-     * Gera um número de conta aleatório e verifica no repositório se ele já existe.
-     * @return String de 6 dígitos únicos.
-     */
     private String generateUniqueAccountNumber() {
         Random random = new Random();
         String number;
@@ -77,5 +59,25 @@ public class AccountService {
         } while (exists);
 
         return number;
+    }
+
+    @Transactional
+    public void deposit(String accountNumber, java.math.BigDecimal amount) {
+        Account account = accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new BusinessException("Account not found"));
+        account.setBalance(account.getBalance().add(amount));
+        accountRepository.save(account);
+    }
+
+    public AccountResponseDTO findByAccountNumber(String accountNumber) {
+        return accountRepository.findByAccountNumber(accountNumber)
+                .map(account -> new AccountResponseDTO(
+                        account.getId(),
+                        account.getAccountNumber(),
+                        account.getBalance(),
+                        account.getType(),
+                        account.getStatus()
+                ))
+                .orElseThrow(() -> new BusinessException("Account not found with number: " + accountNumber));
     }
 }

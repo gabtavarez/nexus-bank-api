@@ -10,4 +10,5 @@ import java.io.Serializable;
 public interface AccountRepository extends JpaRepository<Account, Long> {
     boolean existsByAccountNumber(String accountNumber);
     java.util.Optional<Account> findByAccountNumber(String accountNumber);
+
 }
